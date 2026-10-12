@@ -54,9 +54,9 @@ export interface RagaSpec {
   seconds: number
 }
 
-export function renderRaga(spec: RagaSpec): AudioBuffer {
+/** Pure sample synthesis (no Web Audio), so it can run in a worker. */
+export function renderRagaData(spec: RagaSpec): { L: Float32Array<ArrayBuffer>; R: Float32Array<ArrayBuffer> } {
   const len = Math.floor(spec.seconds * SR)
-  const buf = new AudioBuffer({ length: len, numberOfChannels: 2, sampleRate: SR })
   const L = new Float32Array(len)
   const R = new Float32Array(len)
   const r = rng(spec.seed)
@@ -111,9 +111,40 @@ export function renderRaga(spec: RagaSpec): AudioBuffer {
     L[i] *= norm * f
     R[i] *= norm * f
   }
+  return { L, R }
+}
+
+function toBuffer(L: Float32Array<ArrayBuffer>, R: Float32Array<ArrayBuffer>): AudioBuffer {
+  const buf = new AudioBuffer({ length: L.length, numberOfChannels: 2, sampleRate: SR })
   buf.copyToChannel(L, 0)
   buf.copyToChannel(R, 1)
   return buf
+}
+
+export function renderRaga(spec: RagaSpec): AudioBuffer {
+  const { L, R } = renderRagaData(spec)
+  return toBuffer(L, R)
+}
+
+let worker: Worker | null = null
+/** Synthesise off the main thread so the page never freezes; falls back to inline if workers are unavailable. */
+function renderRagaAsync(spec: RagaSpec): Promise<AudioBuffer> {
+  try {
+    worker ??= new Worker(new URL('./ragaWorker.ts', import.meta.url), { type: 'module' })
+    const w = worker
+    return new Promise<AudioBuffer>((resolve, reject) => {
+      const onMsg = (e: MessageEvent<{ L: Float32Array<ArrayBuffer>; R: Float32Array<ArrayBuffer>; seed: number }>) => {
+        if (e.data.seed !== spec.seed) return
+        w.removeEventListener("message", onMsg)
+        resolve(toBuffer(e.data.L, e.data.R))
+      }
+      w.addEventListener("message", onMsg)
+      w.addEventListener("error", () => reject(new Error("raga worker failed")), { once: true })
+      w.postMessage(spec)
+    }).catch(() => renderRaga(spec))
+  } catch {
+    return Promise.resolve(renderRaga(spec))
+  }
 }
 
 /** Programme lengths of the demo tape's two sides, in seconds (known up front so the label can show them). */
@@ -135,15 +166,10 @@ export const FOUND_TAPES: { title: string; note: string; spec: RagaSpec }[] = [
   { title: 'Lata Evergreen', note: 'recorded off radio', spec: { rootHz: 138.59, scale: [0, 2, 4, 7, 9], bpm: 70, seed: 79, seconds: 90 } },
 ]
 
-/** Yield to the event loop so the UI can paint before a long synthesis starts. */
-const tick = () => new Promise<void>((res) => setTimeout(res, 0))
-
 export async function synthesiseSide(which: keyof typeof DEMO_SPECS): Promise<AudioBuffer> {
-  await tick()
-  return renderRaga(DEMO_SPECS[which])
+  return renderRagaAsync(DEMO_SPECS[which])
 }
 
 export async function synthesiseFound(index: number): Promise<AudioBuffer> {
-  await tick()
-  return renderRaga(FOUND_TAPES[index].spec)
+  return renderRagaAsync(FOUND_TAPES[index].spec)
 }

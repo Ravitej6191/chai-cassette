@@ -1,43 +1,6 @@
 import { useMemo } from 'react'
-import { DoubleSide, Path, Shape, ShapeGeometry } from 'three'
-import { CALENDAR_POS, ROOM, WINDOW } from '../layout'
-import { calendarTexture, canvas, rugTexture, toTexture } from './textures'
-import { usePbr } from './assets'
-
-/** Back wall with a rectangular opening for the window. */
-function BackWall() {
-  const geo = useMemo(() => {
-    const hw = ROOM.w / 2
-    const s = new Shape()
-    s.moveTo(-hw, 0)
-    s.lineTo(hw, 0)
-    s.lineTo(hw, ROOM.h)
-    s.lineTo(-hw, ROOM.h)
-    s.closePath()
-    const hole = new Path()
-    const x0 = WINDOW.x - WINDOW.w / 2
-    const x1 = WINDOW.x + WINDOW.w / 2
-    const y0 = WINDOW.y - WINDOW.h / 2
-    const y1 = WINDOW.y + WINDOW.h / 2
-    hole.moveTo(x0, y0)
-    hole.lineTo(x0, y1)
-    hole.lineTo(x1, y1)
-    hole.lineTo(x1, y0)
-    hole.closePath()
-    s.holes.push(hole)
-    const g = new ShapeGeometry(s)
-    // ShapeGeometry UVs are in metres; scale so the wall texture tiles sensibly
-    const uv = g.attributes.uv
-    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / 1.5, uv.getY(i) / 1.5)
-    return g
-  }, [])
-  const tex = usePbr('painted_plaster_wall', [1.9, 1.9])
-  return (
-    <mesh geometry={geo} position={[0, 0, ROOM.backZ]} receiveShadow>
-      <meshStandardMaterial {...tex} color="#cdbfa6" />
-    </mesh>
-  )
-}
+import { CALENDAR_POS, ROOM } from '../layout'
+import { calendarTexture, canvas, toTexture } from './textures'
 
 function Calendar() {
   const tex = useMemo(() => calendarTexture(), [])
@@ -103,85 +66,10 @@ function Clock() {
   )
 }
 
-/** The living room shell: floor, walls, ceiling, rug, skirting, calendar and wall clock. */
+/** Wall calendar and clock (the shell itself is the baked room in BakedRoom.tsx). */
 export function Room() {
-  const floor = usePbr('old_wooden_floor_02', [3, 3])
-  const rugTex = useMemo(rugTexture, [])
-  const wall = usePbr('painted_plaster_wall', [2.6, 1.4])
-  const rug = useMemo(() => {
-    const [c, g] = canvas(512, 512)
-    g.fillStyle = '#6b1f1f'
-    g.fillRect(0, 0, 512, 512)
-    g.strokeStyle = '#d9b36a'
-    g.lineWidth = 8
-    g.strokeRect(24, 24, 464, 464)
-    g.lineWidth = 3
-    g.strokeRect(48, 48, 416, 416)
-    g.fillStyle = '#2b3a67'
-    g.beginPath()
-    g.moveTo(256, 90)
-    g.lineTo(420, 256)
-    g.lineTo(256, 422)
-    g.lineTo(92, 256)
-    g.closePath()
-    g.fill()
-    g.strokeStyle = '#d9b36a'
-    g.lineWidth = 5
-    g.stroke()
-    g.fillStyle = '#d9b36a'
-    g.beginPath()
-    g.arc(256, 256, 38, 0, 6.3)
-    g.fill()
-    const img = g.getImageData(0, 0, 512, 512)
-    for (let i = 0; i < img.data.length; i += 4) {
-      const n = (Math.random() - 0.5) * 26
-      img.data[i] += n
-      img.data[i + 1] += n
-      img.data[i + 2] += n
-    }
-    g.putImageData(img, 0, 0)
-    return toTexture(c)
-  }, [])
-  const midZ = (ROOM.backZ + ROOM.backZ + ROOM.d) / 2
-  const hw = ROOM.w / 2
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, midZ]} receiveShadow>
-        <planeGeometry args={[ROOM.w, ROOM.d]} />
-        <meshStandardMaterial {...floor} color="#d9c6b0" />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0.2]} receiveShadow>
-        <planeGeometry args={[2.8, 2.0]} />
-        <meshStandardMaterial map={rugTex} roughness={0.98} />
-      </mesh>
-      <BackWall />
-      <mesh position={[-hw, ROOM.h / 2, midZ]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
-        <planeGeometry args={[ROOM.d, ROOM.h]} />
-        <meshStandardMaterial {...wall} color="#cdbfa6" />
-      </mesh>
-      <mesh position={[hw, ROOM.h / 2, midZ]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
-        <planeGeometry args={[ROOM.d, ROOM.h]} />
-        <meshStandardMaterial {...wall} color="#cdbfa6" />
-      </mesh>
-      <mesh position={[0, ROOM.h / 2, ROOM.backZ + ROOM.d]} rotation={[0, Math.PI, 0]}>
-        <planeGeometry args={[ROOM.w, ROOM.h]} />
-        <meshStandardMaterial {...wall} color="#cdbfa6" />
-      </mesh>
-      <mesh position={[0, ROOM.h, midZ]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[ROOM.w, ROOM.d]} />
-        <meshStandardMaterial color="#c9bfa8" roughness={1} side={DoubleSide} />
-      </mesh>
-      {/* skirting boards */}
-      <mesh position={[0, 0.06, ROOM.backZ + 0.012]} receiveShadow>
-        <boxGeometry args={[ROOM.w, 0.12, 0.024]} />
-        <meshStandardMaterial color="#4a2f1b" roughness={0.6} />
-      </mesh>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * (hw - 0.012), 0.06, midZ]}>
-          <boxGeometry args={[0.024, 0.12, ROOM.d]} />
-          <meshStandardMaterial color="#4a2f1b" roughness={0.6} />
-        </mesh>
-      ))}
       <Calendar />
       <Clock />
     </group>

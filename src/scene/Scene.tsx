@@ -15,6 +15,7 @@ import { Lighting } from './Lighting'
 import { PostFX } from './PostFX'
 import { Props } from './Props'
 import { Room } from './Room'
+import { BakedRoom } from './BakedRoom'
 import { Table } from './Table'
 import { Window } from './Window'
 
@@ -137,6 +138,7 @@ export function Scene() {
   return (
     <>
       <Lighting />
+      <BakedRoom />
       <Room />
       <Window />
       <Fan />
