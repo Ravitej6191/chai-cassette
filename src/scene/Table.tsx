@@ -3,7 +3,7 @@ import { CHAI_POS, DECK_POS, TABLE_TOP } from '../layout'
 import { doilyTexture } from './textures'
 import { usePbr } from './assets'
 
-const TOP = { w: 2.0, d: 0.8, t: 0.05, z: -0.1 }
+const TOP = { w: 2.2, d: 0.8, t: 0.05, z: -0.1 }
 
 /** Wooden table with a lace doily under the deck and a small one under the chai. */
 export function Table() {
@@ -13,7 +13,7 @@ export function Table() {
   const legX = TOP.w / 2 - 0.09
   const legZ = TOP.d / 2 - 0.08
   return (
-    <group>
+    <group name="table">
       <mesh position={[0, TABLE_TOP - TOP.t / 2, TOP.z]} castShadow receiveShadow>
         <boxGeometry args={[TOP.w, TOP.t, TOP.d]} />
         <meshStandardMaterial {...top} />

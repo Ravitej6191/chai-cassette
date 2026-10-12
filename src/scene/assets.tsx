@@ -67,6 +67,7 @@ export function Model({ name, height = 1, maxDim, width, position = [0, 0, 0], r
       }
     })
     const g = new Group()
+    g.name = `model:${name}`
     g.add(inner)
     return g
   }, [gltf, height, maxDim, width, castShadow])

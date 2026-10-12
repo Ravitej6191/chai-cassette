@@ -70,7 +70,7 @@ export function Window() {
     if (skyMat.current) skyMat.current.opacity = day
     // streaks run down the pane (slower when reduced motion is on)
     const slow = useDeck.getState().ui.reducedMotion ? 0.3 : 1
-    ;(rain.streaks as Texture).offset.y -= dt * 0.035 * slow
+    ;(rain.streaks as Texture).offset.y += dt * 0.035 * slow
     // rickshaw crossing every ~25 s
     const st = state.current
     st.next -= dt
@@ -95,7 +95,7 @@ export function Window() {
   const h = WINDOW.h
   const bars = [-w / 6, w / 6] // two vertical mullions → three panes
   return (
-    <group position={[WINDOW.x, WINDOW.y, ROOM.backZ]}>
+    <group name="window" position={[WINDOW.x, WINDOW.y, ROOM.backZ]}>
       {/* the world outside */}
       <mesh position={[0, -0.05, -1.4]}>
         <planeGeometry args={[w * 2.6, h * 2.2]} />

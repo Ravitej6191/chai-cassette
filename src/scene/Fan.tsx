@@ -13,7 +13,7 @@ export function Fan() {
   })
   const rod = ROOM.h - FAN_POS.y
   return (
-    <group position={FAN_POS}>
+    <group name="fan" position={FAN_POS}>
       <mesh position={[0, rod / 2, 0]}>
         <cylinderGeometry args={[0.012, 0.012, rod, 10]} />
         <meshStandardMaterial color="#2a2a2a" metalness={0.6} roughness={0.5} />

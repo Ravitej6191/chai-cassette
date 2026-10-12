@@ -20,7 +20,7 @@ export const CASSETTE = { w: 0.1022, h: 0.064, t: 0.012, hubDx: 0.024, hubDy: 0.
 export const LOADED_LOCAL = new Vector3(CAVITY.x, 0.008, CAVITY.backZ + 0.0085)
 export const CRADLE_LOCAL = new Vector3(CAVITY.x, 0.022, CAVITY.backZ + 0.058)
 
-export const RACK_POS = new Vector3(-0.68, TABLE_TOP, -0.3)
+export const RACK_POS = new Vector3(-0.78, TABLE_TOP, -0.3)
 export const RACK = { cols: 4, tiers: 3, colPitch: 0.108, tierPitch: 0.075, tilt: -0.24 }
 export const RACK_SLOTS = RACK.cols * RACK.tiers
 
@@ -85,4 +85,4 @@ export const WINDOW = { x: 0.15, y: 1.62, w: 2.1, h: 1.45 }
 export const CHAI_POS = new Vector3(0.62, TABLE_TOP, 0.1)
 export const LAMP_POS = new Vector3(0.84, TABLE_TOP, -0.34)
 export const FAN_POS = new Vector3(0, 2.2, -0.1)
-export const CALENDAR_POS = new Vector3(-1.72, 2.12, ROOM.backZ + 0.01)
+export const CALENDAR_POS = new Vector3(-1.8, 2.12, ROOM.backZ + 0.01)

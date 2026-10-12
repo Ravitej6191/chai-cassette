@@ -18,7 +18,7 @@ export function Lamp() {
     if (shade.current) shade.current.emissiveIntensity = (0.12 + 1.3 * k) * flicker
   })
   return (
-    <group position={LAMP_POS}>
+    <group name="lamp" position={LAMP_POS}>
       <mesh position={[0, 0.014, 0]} castShadow>
         <cylinderGeometry args={[0.07, 0.085, 0.028, 32]} />
         <meshStandardMaterial color="#b88a3c" metalness={1} roughness={0.32} />

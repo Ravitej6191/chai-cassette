@@ -9,7 +9,7 @@ import { artTexture, spineRowTexture } from './textures'
 const WOOD = '#4a2d1a'
 
 /** Wooden bookcase: shelf rows are textured spine strips (books + a row of cassette cases), with depth behind. */
-export function Bookcase({ position, width = 0.85, height = 1.5, depth = 0.3 }: { position: [number, number, number]; width?: number; height?: number; depth?: number }) {
+export function Bookcase({ position, width = 0.7, height = 1.5, depth = 0.3 }: { position: [number, number, number]; width?: number; height?: number; depth?: number }) {
   const rows = 4
   const rowH = (height - 0.05) / rows
   const wood = usePbr('dark_wood', [0.6, 0.6])
@@ -17,7 +17,7 @@ export function Bookcase({ position, width = 0.85, height = 1.5, depth = 0.3 }: 
   const mat = { ...wood, color: '#b89a7e' }
   const bookH = rowH - 0.03
   return (
-    <group position={position}>
+    <group name="bookcase" position={position}>
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (width / 2 + 0.01), height / 2, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.02, height, depth]} />
@@ -83,7 +83,7 @@ function Frame({ position, rotation = [0, 0, 0], size, kind }: { position: [numb
 export function Frames() {
   const x = -ROOM.w / 2 + 0.02
   return (
-    <group position={[x, 0, -0.1]} rotation={[0, Math.PI / 2, 0]}>
+    <group name="frames" position={[x, 0, 0.3]} rotation={[0, Math.PI / 2, 0]}>
       <Frame position={[0, 1.65, 0]} size={[0.5, 0.65]} kind={0} />
       <Frame position={[0.52, 1.5, 0]} size={[0.3, 0.4]} kind={1} />
       <Frame position={[-0.45, 1.45, 0]} size={[0.32, 0.4]} kind={2} />
@@ -139,20 +139,19 @@ export function Clutter() {
 export function Props() {
   return (
     <>
-      <Bookcase position={[-1.75, 0, -0.74]} />
+      <Bookcase position={[-1.8, 0, -0.74]} />
       <Frames />
       <Clutter />
       <Suspense fallback={null}>
-        <Model name="calathea_orbifolia_01" maxDim={1.1} position={[1.75, 0, -0.55]} rotY={0.6} />
-        <Model name="potted_plant_01" height={0.55} position={[-1.12, 0, -0.62]} rotY={1.2} />
-        <Model name="potted_plant_02" height={0.3} position={[0.92, TABLE_TOP, -0.4]} rotY={0.4} />
-        <Model name="potted_plant_02" height={0.32} position={[-2.0, 1.5, -0.74]} rotY={2.1} />
-        <Model name="WoodenChair_01" width={0.48} position={[-1.0, 0, 0.5]} rotY={2.4} />
-        <Model name="wicker_basket_01" maxDim={0.5} position={[1.55, 0, -0.5]} />
-        <Model name="ArmChair_01" height={0.95} position={[-1.75, 0, 1.15]} rotY={0.9} />
-        <Model name="vintage_radio_transceiver" height={0.22} position={[-1.72, 1.5, -0.76]} rotY={0.25} />
-        <Model name="Ukulele_01" height={0.55} position={[-2.12, 0.04, -0.5]} rotY={Math.PI / 2} rotZ={-0.18} />
-        <Model name="mantel_clock_01" height={0.24} position={[0.95, 0.9, -0.78]} rotY={-0.3} />
+        <Model name="calathea_orbifolia_01" maxDim={0.85} position={[1.7, 0, -0.38]} rotY={0.6} />
+        <Model name="potted_plant_01" height={0.55} position={[-1.14, 0, -0.76]} rotY={1.2} />
+        <Model name="potted_plant_02" height={0.3} position={[0.96, TABLE_TOP, -0.06]} rotY={0.4} />
+        <Model name="WoodenChair_01" width={0.48} position={[-1.2, 0, 0.66]} rotY={2.5} />
+        <Model name="wicker_basket_01" maxDim={0.5} position={[0.5, 0, -0.1]} rotY={0.4} />
+        <Model name="ArmChair_01" height={0.95} position={[-1.95, 0, 1.55]} rotY={0.9} />
+        <Model name="vintage_radio_transceiver" height={0.22} position={[-1.92, 1.5, -0.76]} rotY={0.25} />
+        <Model name="Ukulele_01" height={0.55} position={[-1.4, 0.04, -0.52]} rotY={0.3} rotZ={0.16} />
+        <Model name="mantel_clock_01" width={0.2} position={[1.14, 0.9, -0.8]} rotY={-0.3} />
         <Diya />
       </Suspense>
     </>

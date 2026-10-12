@@ -65,9 +65,8 @@ kbd {
 .link { background: none; border: 0; padding: 0; color: var(--amber); text-decoration: underline; cursor: pointer; }
 
 .hover-tip {
-  position: fixed; left: 50%; bottom: 150px; transform: translateX(-50%); z-index: 9; pointer-events: none; max-width: 90vw;
-  font-size: 13px; padding: 0; color: var(--ink); text-shadow: 0 1px 6px #000, 0 0 12px #000; text-align: center;
-  min-height: 1em;
+  pointer-events: none; max-width: 90vw; min-height: 1.3em; font-size: 13px; color: var(--ink);
+  text-shadow: 0 1px 6px #000, 0 0 12px #000; text-align: center;
 }
 .toast {
   position: fixed; top: 56px; left: 50%; transform: translateX(-50%); z-index: 20; max-width: min(560px, 92vw);

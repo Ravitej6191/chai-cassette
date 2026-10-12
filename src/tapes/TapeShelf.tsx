@@ -19,7 +19,7 @@ export function TapeShelf() {
   const front = (t: number) => 0.075 - t * 0.035 + 0.032
   return (
     <>
-      <group position={RACK_POS} {...zoomProps('rack')}>
+      <group name="rack" position={RACK_POS} {...zoomProps('rack')}>
         {/* back panel */}
         <mesh position={[0, 0.12, BACK_Z]} castShadow receiveShadow>
           <boxGeometry args={[WIDTH + 0.03, 0.245, 0.012]} />

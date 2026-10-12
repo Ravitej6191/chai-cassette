@@ -30,8 +30,8 @@ function useDecal() {
           g.fill()
         }
         // brand
-        text('CHAI & CASSETTE', -0.335, 0.118, 0.0165, { weight: 'bold' })
-        text('STEREO RADIO CASSETTE RECORDER', -0.335, 0.098, 0.0052)
+        text('CHAI & CASSETTE', -0.33, 0.118, 0.0128, { weight: 'bold' })
+        text('STEREO RADIO CASSETTE RECORDER', -0.33, 0.1, 0.0046)
         text('TWO-IN-ONE', 0.335, 0.118, 0.0125, { weight: 'bold' })
         text('FM·MW·SW  ·  DOLBY NR  ·  AUTO-REVERSE', 0.335, 0.098, 0.0042)
         // recessed panels

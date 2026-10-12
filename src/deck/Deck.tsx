@@ -17,7 +17,7 @@ import { VUMeters } from './VUMeters'
  */
 export function Deck() {
   return (
-    <group position={DECK_POS}>
+    <group name="deck" position={DECK_POS}>
       <DeckBody />
       <group {...zoomProps('tape')}>
         <TapeWindow />

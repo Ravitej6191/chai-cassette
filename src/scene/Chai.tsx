@@ -25,7 +25,7 @@ export function Chai() {
   }, [])
 
   return (
-    <group position={CHAI_POS} {...zoomProps('chai')} {...hoverProps('Chai — still hot')}>
+    <group name="chai" position={CHAI_POS} {...zoomProps('chai')} {...hoverProps('Chai — still hot')}>
       <mesh geometry={dabarah} position={[0, 0.002, 0]} castShadow receiveShadow>
         <meshStandardMaterial color="#cdd1d7" metalness={0.3} roughness={0.3} envMapIntensity={2.2} emissive="#34373d" emissiveIntensity={0.6} side={2} />
       </mesh>

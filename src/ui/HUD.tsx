@@ -170,7 +170,6 @@ export function HUD() {
         }}
       />
 
-      <div className="hover-tip" aria-hidden="true">{hover ?? ''}</div>
       {notice && (
         <div className="toast" role="status">
           {notice}
@@ -186,6 +185,7 @@ export function HUD() {
       )}
 
       <footer className="hud-bottom">
+        <div className="hover-tip" aria-hidden="true">{hover ?? ''}</div>
         <TapeList />
         <div className="console">
           <div className="console__status">
