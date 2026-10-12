@@ -26,12 +26,14 @@ const TIPS: Record<string, string> = {
 
 function Key({ name, index }: { name: KeyName; index: number }) {
   const g = useRef<Group>(null)
-  const mats = useMemo(() => {
-    const body = new MeshStandardMaterial({ color: '#cfcfcb', roughness: 0.45, metalness: 0.1 })
-    const face = new MeshStandardMaterial({ map: keyTexture(ICONS[name], LABELS[name]), roughness: 0.4, metalness: 0.05 })
-    // BoxGeometry face order: +x −x +y −y +z −z
-    return [body, body, body, body, face, body]
-  }, [name])
+  const { body, face } = useMemo(
+    () => ({
+      body: new MeshStandardMaterial({ color: '#cfcfcb', roughness: 0.45, metalness: 0.1 }),
+      // icon + label artwork, printed on a plane over the key's front face
+      face: new MeshStandardMaterial({ map: keyTexture(ICONS[name], LABELS[name]), roughness: 0.4, metalness: 0.05, polygonOffset: true, polygonOffsetFactor: -2 }),
+    }),
+    [name],
+  )
   useFrame(() => {
     if (g.current) g.current.position.z = KEY_Z - TRAVEL * (anim.keys[name] ?? 0)
   })
@@ -49,7 +51,10 @@ function Key({ name, index }: { name: KeyName; index: number }) {
   }
   return (
     <group ref={g} position={[DL.keys.x(index), DL.keys.y, KEY_Z]}>
-      <RoundedBox args={[DL.keys.w, DL.keys.h, KEY_D]} radius={0.003} smoothness={2} material={mats} castShadow onPointerDown={down} {...hp} />
+      <RoundedBox args={[DL.keys.w, DL.keys.h, KEY_D]} radius={0.003} smoothness={2} material={body} castShadow onPointerDown={down} {...hp} />
+      <mesh position={[0, 0, KEY_D / 2 + 0.0004]} material={face} onPointerDown={down} {...hp}>
+        <planeGeometry args={[DL.keys.w - 0.006, DL.keys.h - 0.006]} />
+      </mesh>
     </group>
   )
 }
