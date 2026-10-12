@@ -108,6 +108,24 @@ function ViewBar() {
   )
 }
 
+// ---------------------------------------------------------------- stats
+
+/** Frame time, draw calls, triangles, and which GPU the browser picked. */
+function StatsPanel() {
+  const show = useDeck((s) => s.ui.showStats)
+  const { fps, perf, gpu, quality, dprCap } = useDeck((s) => s.ui)
+  if (!show) return null
+  return (
+    <aside className="stats" aria-label="Performance stats">
+      <div className="stats__big">{fps || '–'} <span>fps</span></div>
+      <div>{perf.ms ? perf.ms.toFixed(1) : '–'} ms/frame</div>
+      <div>{perf.calls} draw calls · {(perf.tris / 1000).toFixed(0)}k tris</div>
+      <div>{perf.textures} textures · {quality} · ×{dprCap}</div>
+      {gpu && <div className="stats__gpu" title="If this is an integrated GPU and you have a discrete one, set your browser to High performance in Windows Graphics settings.">{gpu}</div>}
+    </aside>
+  )
+}
+
 // ---------------------------------------------------------------- settings
 
 const TODS: [string, TimeOfDay][] = [
@@ -173,6 +191,12 @@ function Settings() {
                 </button>
               ))}
             </div>
+          </div>
+          <div className="menu__row menu__row--inline">
+            <span className="menu__label">Performance stats</span>
+            <button type="button" className={`switch ${ui.showStats ? 'switch--on' : ''}`} role="switch" aria-checked={ui.showStats} aria-label="Performance stats" onClick={() => patch({ showStats: !ui.showStats })}>
+              <span />
+            </button>
           </div>
           <div className="menu__row menu__row--inline">
             <span className="menu__label">Rain sound</span>
@@ -253,6 +277,7 @@ export function HUD() {
       </header>
 
       <ViewBar />
+      <StatsPanel />
 
       {help && <HelpCard onPick={() => fileInput.current?.click()} />}
       <input

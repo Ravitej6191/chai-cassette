@@ -89,6 +89,14 @@ Choose a tier under **Settings → Graphics** (Auto · Low · High · Ultra). Lo
 
 Deliberately minimal: a view bar (Room · Deck · Tape · Controls · Radio · Meters · Shelf · Chai), one **Settings** menu (time of day, graphics tier, rain sound, help) and a single status line with the five transport keys. Tapes are chosen on the 3D shelf, not from a list. In a focus view the mouse wheel zooms only a little; while you hold a tape the wheel turns the tape instead.
 
+## Performance
+
+- **Settings → Performance stats** shows fps, ms/frame, draw calls, triangles and **which GPU the browser is using**. On laptops with both integrated and discrete graphics, browsers often pick the integrated one: set your browser to *High performance* in Windows → Settings → System → Display → Graphics.
+- Auto quality lowers the render resolution first (no recompiling), then the graphics tier.
+- Shadow maps refresh at 10 Hz (lamp) / 20 Hz (fan) instead of every frame; parts smaller than ~5 cm don't cast shadows.
+- Tapes resting on the shelf are drawn as 3 meshes (shell, painted insides, label); only a held or loaded tape gets the full build (reels, ribbon, hubs, screws).
+- Measured on the dev scene: ~1,400 → ~350 draw calls per frame.
+
 ## Development
 
 - CI (`.github/workflows/ci.yml`) runs typecheck, tests and build on every push.

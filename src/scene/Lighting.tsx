@@ -57,7 +57,19 @@ export function Lighting() {
     aim(rick.current, -0.5, 2.8, 0.5)
   }, [])
 
+  // The lamp's shadows only change when something is moved by hand, and the fan's turn slowly, so the
+  // shadow maps are re-rendered 10×/s and 20×/s instead of every frame. That removes most of the
+  // shadow cost for no visible difference.
+  const shadowTick = useRef(0)
+  useEffect(() => {
+    if (lampSpot.current) lampSpot.current.shadow.autoUpdate = false
+    if (fanLight.current) fanLight.current.shadow.autoUpdate = false
+  }, [low])
+
   useFrame((state, dt) => {
+    shadowTick.current++
+    if (lampSpot.current && shadowTick.current % 6 === 0) lampSpot.current.shadow.needsUpdate = true
+    if (fanLight.current && shadowTick.current % 3 === 0) fanLight.current.shadow.needsUpdate = true
     const want = PRESETS[resolveTod(todSetting)]
     ease(tod.cur, want, 1 - Math.exp(-dt * 1.2))
     const c = tod.cur

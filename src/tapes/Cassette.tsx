@@ -22,7 +22,7 @@ import { packRadii } from './reelMath'
 import { useDeck } from '../state/store'
 import { live } from '../state/live'
 import { held, flipHeld, insertHeld, pickUp, putBack } from '../controller/deck'
-import { faceTexture } from './labelTextures'
+import { faceTexture, interiorTexture } from './labelTextures'
 import { CASSETTE, DECK_POS, HELD_POS, HELD_SCALE, LOADED_LOCAL, RACK_POS, cradlePose, loadedPose, slotPose } from '../layout'
 import { HUB_R, type Tape } from './types'
 import { hoverProps, lockOrbit } from '../scene/interaction'
@@ -144,6 +144,14 @@ export function Cassette({ id }: Props) {
     [textures],
   )
 
+  // flat painted insides for the shelf level-of-detail
+  const interior = useMemo(
+    () => (tape ? interiorTexture(tape) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tape?.id, tape?.wound, tape?.side, tape?.format],
+  )
+  useEffect(() => () => interior?.dispose(), [interior])
+
   const labelMats = useMemo(() => {
     if (!textures) return null
     const mk = (map: typeof textures.A) =>
@@ -211,6 +219,8 @@ export function Cassette({ id }: Props) {
 
   if (!tape || !labelMats || !shell || !plateMat) return null
   const isLive = isDeckTape && (placement === 'loaded' || placement === 'cradle')
+  // resting on the shelf a tape is drawn as shell + painted insides + label (3 meshes); in hand or in the deck it gets the full build
+  const detail = placement !== 'shelf'
   const label = `${tape.title}${tape.isDemo ? '' : ''} · ${tape.format}`
 
   // ---- interaction
@@ -284,11 +294,18 @@ export function Cassette({ id }: Props) {
       }}
     >
       {/* translucent shell */}
-      <RoundedBox args={[CASSETTE.w, CASSETTE.h, CASSETTE.t]} radius={0.0026} smoothness={3} castShadow renderOrder={1}>
+      <RoundedBox args={[CASSETTE.w, CASSETTE.h, CASSETTE.t]} radius={0.0026} smoothness={3} castShadow={detail} renderOrder={1}>
         <primitive object={shell} ref={shellMat} attach="material" />
       </RoundedBox>
       {/* front & back label art (with the tape window cut out) */}
       <mesh geometry={labelGeo} material={labelMats.A} position={[0, 0, SIDE_T + 0.0002]} renderOrder={3} />
+      {!detail && interior && (
+        <mesh geometry={labelGeo} position={[0, 0, 0]}>
+          <meshStandardMaterial map={interior} roughness={0.7} />
+        </mesh>
+      )}
+      {detail && (
+        <>
       <mesh geometry={labelGeo} material={labelMats.B} position={[0, 0, -SIDE_T - 0.0002]} rotation={[0, Math.PI, 0]} renderOrder={3} />
       {/* opaque chin and side blocks around the open tape-access slot */}
       <mesh position={[0, -0.0307, 0]} material={plateMat}>
@@ -325,6 +342,8 @@ export function Cassette({ id }: Props) {
           <meshStandardMaterial color="#1a1612" roughness={0.6} side={DoubleSide} />
         </mesh>
       ))}
+        </>
+      )}
     </group>
   )
 }

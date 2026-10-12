@@ -5,7 +5,8 @@
 import type { CanvasTexture } from 'three'
 import { canvas, toTexture } from '../scene/textures'
 import { rng } from './generator'
-import type { Side, Tape } from './types'
+import { packRadii } from './reelMath'
+import { HUB_R, type Side, type Tape } from './types'
 
 export const FACE_W = 1024
 export const FACE_H = 642
@@ -176,4 +177,52 @@ export function drawJCard(tape: Tape): HTMLCanvasElement {
   g.lineWidth = 2
   g.strokeRect(10, 10, W - 20, H - 20)
   return c
+}
+
+/**
+ * A single flat picture of the cassette's insides (tape packs, hubs, ribbon) used while the tape is
+ * resting on the shelf, where nobody can tell it from the real reels — so the shelf costs 1 mesh
+ * per tape instead of ~40.
+ */
+export function interiorTexture(tape: Tape): CanvasTexture {
+  const [c, g] = canvas(FACE_W / 2, FACE_H / 2)
+  const k = PX_MM / 2
+  const X2 = (mm: number) => (mm + 51.1) * k
+  const Y2 = (mm: number) => (32 - mm) * k
+  g.fillStyle = '#0b0908'
+  g.fillRect(0, 0, c.width, c.height)
+  const { rL, rR } = packRadii(tape, tape.side === 'A' ? tape.wound : 1 - tape.wound)
+  const hubs: [number, number][] = [[-24, rL], [24, rR]]
+  for (const [mx, r] of hubs) {
+    const cx = X2(mx)
+    const cy = Y2(2)
+    g.fillStyle = '#3a261a'
+    g.beginPath()
+    g.arc(cx, cy, r * 1000 * k, 0, 6.3)
+    g.fill()
+    g.strokeStyle = 'rgba(0,0,0,0.35)'
+    g.lineWidth = 1
+    for (let i = 1; i < 6; i++) {
+      g.beginPath()
+      g.arc(cx, cy, r * 1000 * k * (i / 6) + HUB_R * 1000 * k * 0.4, 0, 6.3)
+      g.stroke()
+    }
+    g.fillStyle = '#e9e6dc'
+    g.beginPath()
+    g.arc(cx, cy, HUB_R * 1000 * k, 0, 6.3)
+    g.fill()
+    g.fillStyle = '#17140f'
+    g.beginPath()
+    g.arc(cx, cy, HUB_R * 1000 * k * 0.6, 0, 6.3)
+    g.fill()
+  }
+  g.strokeStyle = '#1b100a'
+  g.lineWidth = 1.5
+  g.beginPath()
+  g.moveTo(X2(-24), Y2(2 - rL * 1000))
+  g.lineTo(X2(-28.5), Y2(-28.8))
+  g.lineTo(X2(28.5), Y2(-28.8))
+  g.lineTo(X2(24), Y2(2 - rR * 1000))
+  g.stroke()
+  return toTexture(c, { aniso: 4 })
 }

@@ -91,6 +91,15 @@ kbd {
 .view:hover { color: var(--ink); }
 .view--on { background: var(--amber); color: var(--amber-ink); font-weight: 600; }
 
+/* ---------- stats panel ---------- */
+.stats {
+  position: fixed; left: 18px; bottom: 18px; z-index: 11; padding: 10px 14px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 12px; font-size: 12.5px; line-height: 1.5; font-variant-numeric: tabular-nums; color: var(--ink-dim); max-width: 260px;
+}
+.stats__big { font-size: 22px; font-weight: 600; color: var(--amber); line-height: 1.1; }
+.stats__big span { font-size: 12px; color: var(--ink-dim); font-weight: 500; }
+.stats__gpu { margin-top: 4px; color: var(--ink); font-weight: 500; overflow-wrap: anywhere; }
+
 /* ---------- help / notices ---------- */
 .help {
   position: fixed; top: 106px; left: 18px; z-index: 10; width: min(380px, calc(100vw - 36px)); padding: 16px 18px 14px;

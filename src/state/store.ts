@@ -45,6 +45,13 @@ interface UiState {
   fps: number
   /** When true the app lowers quality by itself if it cannot hold a smooth frame rate. */
   autoQuality: boolean
+  /** Highest device-pixel-ratio the canvas may use. The governor lowers this before dropping a whole tier. */
+  dprCap: number
+  /** Show the stats panel (frame time, draw calls, triangles, GPU). */
+  showStats: boolean
+  /** What the browser is actually rendering on (e.g. the integrated GPU instead of the discrete one). */
+  gpu: string
+  perf: { ms: number; calls: number; tris: number; textures: number }
   help: boolean
   reducedMotion: boolean
   notice: string | null
@@ -106,6 +113,10 @@ export const useDeck = create<DeckStore>((set, get) => ({
     rain: true,
     fps: 0,
     autoQuality: true,
+    dprCap: isMobile ? 1 : 1.5,
+    showStats: false,
+    gpu: '',
+    perf: { ms: 0, calls: 0, tris: 0, textures: 0 },
     help: !isMobile,
     reducedMotion:
       typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,

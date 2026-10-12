@@ -11,6 +11,7 @@ import { useDeck } from './state/store'
 
 export default function App() {
   const quality = useDeck((s) => s.ui.quality)
+  const dprCap = useDeck((s) => s.ui.dprCap)
   const ready = useDeck((s) => s.ui.ready)
   const patch = useDeck((s) => s.patchUi)
   const [label, setLabel] = useState('Sharpening pencils')
@@ -94,7 +95,7 @@ export default function App() {
         {booted && (
           <Canvas
             shadows={quality === 'low' ? 'basic' : 'percentage'}
-            dpr={quality === 'low' ? 1 : quality === 'high' ? [1, 1.5] : [1, 1.75]}
+            dpr={quality === 'low' ? 1 : [1, quality === 'ultra' ? dprCap + 0.25 : dprCap]}
             camera={{ fov: 45, near: 0.02, far: 40, position: [0.5, 1.72, 3.55] }}
             gl={{ antialias: false, powerPreference: 'high-performance', toneMapping: ACESFilmicToneMapping }}
             onCreated={(state) => {
