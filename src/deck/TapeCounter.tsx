@@ -4,7 +4,7 @@ import { CylinderGeometry, type Mesh, type Texture } from 'three'
 import { FRONT_Z } from '../layout'
 import { live } from '../state/live'
 import { resetCounter } from '../controller/deck'
-import { hoverProps } from '../scene/interaction'
+import { controlsLive, hoverProps } from '../scene/interaction'
 import { digitStrip } from '../scene/textures'
 import { DL } from './layout'
 
@@ -87,6 +87,7 @@ export function TapeCounter() {
           rotation={[Math.PI / 2, 0, 0]}
           castShadow
           onPointerDown={(e) => {
+            if (!controlsLive()) return
             e.stopPropagation()
             resetCounter()
             const b = e.object

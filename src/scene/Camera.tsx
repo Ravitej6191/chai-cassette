@@ -15,6 +15,32 @@ export function zoomFocus(part: ZoomPart): Vector3 {
   return DECK_POS.clone().add(new Vector3(x, y, z))
 }
 
+/** Free-look range used in the room. */
+const widenLimits = () => {
+  const c = rig.controls
+  if (!c) return
+  c.minAzimuthAngle = -0.95
+  c.maxAzimuthAngle = 0.95
+  c.minPolarAngle = 0.6
+  c.maxPolarAngle = 1.52
+  c.minDistance = 0.25
+  c.maxDistance = 4.4
+}
+
+/** In a focus view the camera may only drift a little around the framed position, so the view stays tidy. */
+const tightenLimits = (dist: number) => {
+  const c = rig.controls
+  if (!c) return
+  const az = c.getAzimuthalAngle()
+  const po = c.getPolarAngle()
+  c.minAzimuthAngle = az - 0.28
+  c.maxAzimuthAngle = az + 0.28
+  c.minPolarAngle = po - 0.16
+  c.maxPolarAngle = po + 0.16
+  c.minDistance = dist * 0.78
+  c.maxDistance = dist * 1.25
+}
+
 /** How much farther back to stand so the deck still fits a narrow (portrait) viewport. */
 const fitFor = (aspect: number) => Math.min(2, Math.max(1, 1.25 / Math.max(aspect, 0.01)))
 
@@ -77,13 +103,15 @@ export function CameraRig() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready])
 
-  // zoom to part / back
+  // focus view / back to the room
   useEffect(() => {
     if (!useDeck.getState().ui.introDone) return
+    widenLimits() // free the camera while it travels
     if (zoom) {
       const f = zoomFocus(zoom)
       const d = ZOOM_PARTS[zoom].dist * fitFor(aspect)
-      flyTo(new Vector3(f.x, f.y + d * 0.28, f.z + d * 0.95), f, 1.1)
+      // nearly front-on, a touch above, so every control is easy to see and hit
+      flyTo(new Vector3(f.x, f.y + d * 0.1, f.z + d * 0.99), f, 1.1, 'power3.inOut', () => tightenLimits(d))
     } else {
       const d = defaultPose(aspect)
       flyTo(d.pos, d.target, 1.1)

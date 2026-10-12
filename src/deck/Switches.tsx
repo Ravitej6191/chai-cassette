@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { MathUtils, type Group } from 'three'
 import { FRONT_Z } from '../layout'
-import { hoverProps } from '../scene/interaction'
+import { controlsLive, hoverProps } from '../scene/interaction'
 import { sfx } from '../sfx/sfx'
 import { TAPE_TYPE_NAMES, useDeck, type TapeType } from '../state/store'
 import { DL } from './layout'
@@ -18,6 +18,7 @@ export function Toggle({ x, y, on, onToggle, label }: { x: number; y: number; on
     <group
       position={[x, y, FRONT_Z]}
       onPointerDown={(e) => {
+        if (!controlsLive()) return
         e.stopPropagation()
         sfx.switchFlip()
         onToggle()
@@ -64,6 +65,7 @@ export function SlideSwitch3({ x, y, value, onChange }: { x: number; y: number; 
         position={[0, 0, 0.0012]}
         castShadow
         onPointerDown={(e) => {
+          if (!controlsLive()) return
           e.stopPropagation()
           const lx = e.object.worldToLocal(e.point.clone()).x
           const next = (lx < -0.0125 ? 0 : lx > 0.0125 ? 2 : 1) as TapeType

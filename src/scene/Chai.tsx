@@ -4,7 +4,7 @@ import { AdditiveBlending, BufferAttribute, BufferGeometry, LatheGeometry, Vecto
 import { CHAI_POS } from '../layout'
 import { useDeck } from '../state/store'
 import { softDot } from './textures'
-import { hoverProps, zoomProps } from './interaction'
+import { hoverProps, viewProps } from './interaction'
 
 /** Steel tumbler of chai on a dabarah (saucer-bowl), with rising steam. */
 export function Chai() {
@@ -25,7 +25,7 @@ export function Chai() {
   }, [])
 
   return (
-    <group name="chai" position={CHAI_POS} {...zoomProps('chai')} {...hoverProps('Chai — still hot')}>
+    <group name="chai" position={CHAI_POS} {...viewProps('chai')} {...hoverProps('Chai — still hot')}>
       <mesh geometry={dabarah} position={[0, 0.002, 0]} castShadow receiveShadow>
         <meshStandardMaterial color="#cdd1d7" metalness={0.3} roughness={0.3} envMapIntensity={2.2} emissive="#34373d" emissiveIntensity={0.6} side={2} />
       </mesh>
@@ -85,7 +85,7 @@ function Steam() {
     col.needsUpdate = true
   })
   return (
-    <points ref={ref} geometry={geo} frustumCulled={false}>
+    <points ref={ref} geometry={geo} frustumCulled={false} raycast={() => null}>
       <pointsMaterial map={tex} size={0.075} vertexColors transparent depthWrite={false} blending={AdditiveBlending} sizeAttenuation />
     </points>
   )

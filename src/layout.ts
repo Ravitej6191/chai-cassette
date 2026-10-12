@@ -64,10 +64,12 @@ export const DEFAULT_CAM = {
   target: new Vector3(-0.1, 1.05, -0.2),
 }
 
-export type ZoomPart = 'tape' | 'vu' | 'keys' | 'knobs' | 'switches' | 'counter' | 'radio' | 'speaker' | 'rack' | 'chai'
+export type ZoomPart = 'deck' | 'controls' | 'tape' | 'vu' | 'keys' | 'knobs' | 'switches' | 'counter' | 'radio' | 'speaker' | 'rack' | 'chai'
 
 /** Camera zoom framings per touchable part (deck-local focus + viewing distance). */
 export const ZOOM_PARTS: Record<ZoomPart, { local: [number, number, number]; dist: number }> = {
+  deck: { local: [0, -0.005, FRONT_Z], dist: 0.98 },
+  controls: { local: [0.0, -0.03, FRONT_Z], dist: 0.56 },
   tape: { local: [CAVITY.x, 0.0, FRONT_Z], dist: 0.34 },
   vu: { local: [0.145, 0.115, FRONT_Z], dist: 0.3 },
   keys: { local: [0, -0.1, FRONT_Z], dist: 0.42 },

@@ -1,5 +1,5 @@
 import { DECK_POS } from '../layout'
-import { zoomProps } from '../scene/interaction'
+import { viewProps } from '../scene/interaction'
 import { CassetteDoor } from './CassetteDoor'
 import { DeckBody } from './DeckBody'
 import { Knobs } from './Knobs'
@@ -17,31 +17,31 @@ import { VUMeters } from './VUMeters'
  */
 export function Deck() {
   return (
-    <group name="deck" position={DECK_POS}>
+    <group name="deck" position={DECK_POS} {...viewProps('deck')}>
       <DeckBody />
-      <group {...zoomProps('tape')}>
+      <group {...viewProps('tape', 'deck')}>
         <TapeWindow />
         <CassetteDoor />
       </group>
-      <group {...zoomProps('keys')}>
+      <group {...viewProps('keys', 'deck')}>
         <PianoKeys />
       </group>
-      <group {...zoomProps('vu')}>
+      <group {...viewProps('vu', 'deck')}>
         <VUMeters />
       </group>
-      <group {...zoomProps('counter')}>
+      <group {...viewProps('counter', 'deck')}>
         <TapeCounter />
       </group>
-      <group {...zoomProps('knobs')}>
+      <group {...viewProps('knobs', 'deck')}>
         <Knobs />
       </group>
-      <group {...zoomProps('switches')}>
+      <group {...viewProps('switches', 'deck')}>
         <Switches />
       </group>
-      <group {...zoomProps('radio')}>
+      <group {...viewProps('radio', 'deck')}>
         <RadioSection />
       </group>
-      <group {...zoomProps('speaker')}>
+      <group {...viewProps('speaker', 'deck')}>
         <Speakers />
       </group>
     </group>

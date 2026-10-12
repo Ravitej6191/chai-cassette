@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { BufferGeometry, CylinderGeometry, type Group } from 'three'
 import { FRONT_Z } from '../layout'
-import { lockOrbit, hoverProps } from '../scene/interaction'
+import { controlsLive, lockOrbit, hoverProps } from '../scene/interaction'
 import { sfx } from '../sfx/sfx'
 import { useDeck, type Settings } from '../state/store'
 import { DL } from './layout'
@@ -51,6 +51,7 @@ export function Knob({ position, value, onChange, label, steps = 10, center = fa
 
   const hp = hoverProps(label, 'ns-resize')
   const down = (e: { stopPropagation: () => void; clientY?: number; nativeEvent?: PointerEvent }) => {
+    if (!controlsLive()) return
     e.stopPropagation()
     const startY = (e as unknown as { clientY: number }).clientY
     const startV = value

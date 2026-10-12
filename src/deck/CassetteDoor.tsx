@@ -4,7 +4,7 @@ import { MathUtils, type Group } from 'three'
 import { CAVITY, FRONT_Z } from '../layout'
 import { anim } from '../state/live'
 import { doorClick } from '../controller/deck'
-import { hoverProps } from '../scene/interaction'
+import { controlsLive, hoverProps } from '../scene/interaction'
 import { useDeck } from '../state/store'
 
 const W = CAVITY.w + 0.008
@@ -26,7 +26,11 @@ export function CassetteDoor() {
   return (
     <group position={[CAVITY.x, HINGE_Y, FRONT_Z + 0.0035]}>
       <group ref={hinge}>
-        <group position={[0, -H / 2, 0]} onClick={(e) => { e.stopPropagation(); doorClick() }} {...hp}>
+        <group position={[0, -H / 2, 0]} onClick={(e) => {
+          if (!controlsLive()) return // first click only frames the deck
+          e.stopPropagation()
+          doorClick()
+        }} {...hp}>
           {/* smoked pane */}
           <mesh renderOrder={6}>
             <boxGeometry args={[W - 0.012, H - 0.012, 0.0022]} />

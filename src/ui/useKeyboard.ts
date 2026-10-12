@@ -62,6 +62,13 @@ export function useKeyboard() {
           if (s.heldId) void loadTape(s.heldId)
           else if (s.tapes[0]) void loadTape(s.deckTapeId ?? s.tapes[0].id)
           break
+        case 'v':
+        case 'V': {
+          const order = [null, 'deck', 'tape', 'controls', 'radio', 'vu', 'rack', 'chai'] as const
+          const i = order.indexOf(s.ui.zoom as (typeof order)[number])
+          s.patchUi({ zoom: order[(i + 1) % order.length] })
+          break
+        }
         case 'Escape':
           if (s.heldId) putBack()
           else if (s.ui.zoom) s.patchUi({ zoom: null })

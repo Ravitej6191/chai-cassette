@@ -57,7 +57,7 @@ kbd {
 .select select option { background: #1a1210; }
 
 .help {
-  position: fixed; top: 52px; left: 16px; z-index: 10; max-width: min(380px, calc(100vw - 32px)); padding: 12px 14px;
+  position: fixed; top: 92px; left: 16px; z-index: 10; max-width: min(380px, calc(100vw - 32px)); padding: 12px 14px;
   background: var(--panel); border: 1px solid var(--line); border-radius: 10px; font-size: 12.5px; line-height: 1.5; backdrop-filter: blur(8px);
 }
 .help ul { margin: 6px 0 0; padding-left: 18px; }
@@ -69,13 +69,13 @@ kbd {
   text-shadow: 0 1px 6px #000, 0 0 12px #000; text-align: center;
 }
 .toast {
-  position: fixed; top: 56px; left: 50%; transform: translateX(-50%); z-index: 20; max-width: min(560px, 92vw);
+  position: fixed; top: 92px; left: 50%; transform: translateX(-50%); z-index: 20; max-width: min(560px, 92vw);
   background: rgba(30, 18, 10, 0.92); border: 1px solid var(--amber); border-radius: 10px; padding: 9px 14px; font-size: 13px; text-align: center;
   animation: toast 0.3s ease;
 }
 @keyframes toast { from { opacity: 0; transform: translate(-50%, -8px); } }
 
-.hand-bar { position: fixed; right: 16px; top: 52px; z-index: 10; display: flex; gap: 8px; }
+.hand-bar { position: fixed; right: 16px; top: 92px; z-index: 10; display: flex; gap: 8px; }
 
 .hud-bottom {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; gap: 8px; justify-items: center;
@@ -134,3 +134,15 @@ kbd {
   .pencil, .reel { animation-duration: 6s; }
   .toast { animation: none; }
 }
+
+/* ---------- guided camera views ---------- */
+.views {
+  position: fixed; top: 46px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 4px; flex-wrap: wrap;
+  justify-content: center; max-width: calc(100vw - 24px); padding: 4px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 999px; backdrop-filter: blur(8px);
+}
+.view { background: transparent; border: 0; border-radius: 999px; padding: 4px 11px; font-size: 12px; cursor: pointer; color: var(--ink-dim); }
+.view:hover { color: var(--ink); }
+.view--on { background: var(--amber); color: #1a1008; }
+.view:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+@media (max-width: 640px) { .views { top: 44px; border-radius: 14px; } .help { top: 96px; } .toast { top: 100px; } }

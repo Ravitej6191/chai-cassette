@@ -4,6 +4,7 @@ import { useDeck, TAPE_TYPE_NAMES, type TimeOfDay } from '../state/store'
 import { addFiles, flipHeld, loadTape, pressKey, putBack, resetCounter } from '../controller/deck'
 import type { KeyName } from '../state/machine'
 import { sideSeconds } from '../tapes/types'
+import type { ZoomPart } from '../layout'
 
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 
@@ -92,6 +93,32 @@ function TapeList() {
   )
 }
 
+/** Guided camera views: pick one and the camera glides to a clean, front-on framing. */
+const VIEWS: [string, ZoomPart | null][] = [
+  ['Room', null],
+  ['Deck', 'deck'],
+  ['Tape', 'tape'],
+  ['Controls', 'controls'],
+  ['Radio', 'radio'],
+  ['Meters', 'vu'],
+  ['Shelf', 'rack'],
+  ['Chai', 'chai'],
+]
+
+function ViewBar() {
+  const zoom = useDeck((s) => s.ui.zoom)
+  const patch = useDeck((s) => s.patchUi)
+  return (
+    <nav className="views" aria-label="Camera views">
+      {VIEWS.map(([label, part]) => (
+        <button key={label} type="button" className={`view ${zoom === part ? 'view--on' : ''}`} aria-pressed={zoom === part} onClick={() => patch({ zoom: part })}>
+          {label}
+        </button>
+      ))}
+    </nav>
+  )
+}
+
 const TODS: TimeOfDay[] = ['night', 'evening', 'afternoon', 'morning', 'auto']
 
 export function HUD() {
@@ -145,6 +172,8 @@ export function HUD() {
           </button>
         </div>
       </header>
+
+      <ViewBar />
 
       {help && (
         <aside className="help" aria-label="Help">

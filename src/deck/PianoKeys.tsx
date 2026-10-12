@@ -5,7 +5,7 @@ import { RoundedBox } from '@react-three/drei'
 import { FRONT_Z } from '../layout'
 import { anim } from '../state/live'
 import { pressKey } from '../controller/deck'
-import { hoverProps } from '../scene/interaction'
+import { controlsLive, hoverProps } from '../scene/interaction'
 import { keyTexture } from '../scene/textures'
 import type { KeyName } from '../state/machine'
 import { DL } from './layout'
@@ -39,6 +39,7 @@ function Key({ name, index }: { name: KeyName; index: number }) {
   })
   const hp = hoverProps(TIPS[name])
   const down = (e: { stopPropagation: () => void; target?: unknown; pointerId?: number }) => {
+    if (!controlsLive()) return // first click only frames the deck
     e.stopPropagation()
     pressKey(name, 'down')
     const up = () => {

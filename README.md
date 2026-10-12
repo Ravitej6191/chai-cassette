@@ -27,7 +27,10 @@ npm test           # state-machine tests
 | `F` / double-click / wheel while holding a tape | Flip / spin it; `Esc` puts it back |
 | Drag a knob up/down | Volume, bass, treble, balance, pitch (±12 %, centre detent) |
 | Click toggles / slider | Dolby, auto-reverse, low battery, tape type I / II / IV |
-| Double-click any part, click empty space | Camera zooms to it / back |
+| Click the deck, rack or chai | Camera glides to a clean front-on **focus view** (controls only respond once you're in it) |
+| View bar (top) or `V` | Jump between Room · Deck · Tape · Controls · Radio · Meters · Shelf · Chai |
+| Double-click a part | Frame that sub-part directly (e.g. only the meters) |
+| Click empty space, `Esc`, or **Room** | Back to the free-look room |
 
 ## Architecture
 
