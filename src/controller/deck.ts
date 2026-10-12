@@ -522,6 +522,7 @@ async function runBoot(progress: ProgressFn) {
       Promise.race([document.fonts.load(`28px "${f}"`).catch(() => []), sleep(2500)]),
     ),
   )
+  await Promise.race([document.fonts.load('700 28px "Barlow Condensed"').catch(() => []), sleep(2500)])
   progress(0.15, 'Warming up the tape heads')
 
   // 2. the demo tape. Its music is synthesised the first time the tape is needed (and pre-warmed

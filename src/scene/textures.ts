@@ -352,18 +352,19 @@ export function grilleTexture(): { map: Texture; alpha: Texture } {
 
 /** Silk-screened labels on the deck's front panel. Coordinates map deck-local metres → pixels. */
 export function panelDecal(W: number, H: number, draw: (g: CanvasRenderingContext2D, px: (x: number) => number, py: (y: number) => number, s: number) => void): Texture {
-  const PX = 2400
+  const PX = 4096
   const PY = Math.round((PX * H) / W)
   const [c, g] = canvas(PX, PY)
   const px = (x: number) => (x / W + 0.5) * PX
   const py = (y: number) => (0.5 - y / H) * PY
   draw(g, px, py, PX / W)
-  return toTexture(c)
+  return toTexture(c, { aniso: 16 })
 }
 
 /** Piano-key face with an icon. */
 export function keyTexture(icon: 'rec' | 'play' | 'rew' | 'ff' | 'stop' | 'pause', label: string): Texture {
-  const [c, g] = canvas(256, 160)
+  const [c, g] = canvas(512, 320)
+  g.scale(2, 2)
   g.fillStyle = '#d9d9d6'
   g.fillRect(0, 0, 256, 160)
   const grad = g.createLinearGradient(0, 0, 0, 160)
@@ -418,10 +419,10 @@ export function keyTexture(icon: 'rec' | 'play' | 'rew' | 'ff' | 'stop' | 'pause
       g.fillRect(cx + 8, cy - 30, 20, 60)
       break
   }
-  g.font = 'bold 26px "Special Elite", Arial, sans-serif'
+  g.font = '700 31px "Barlow Condensed", "Arial Narrow", Arial, sans-serif'
   g.textAlign = 'center'
-  g.fillStyle = '#3b3631'
-  g.fillText(label, 128, 140)
+  g.fillStyle = '#2a2622'
+  g.fillText(label, 128, 142)
   return toTexture(c)
 }
 
@@ -496,7 +497,8 @@ export function meterFace(channel: string): Texture {
 export function dialTexture(): Texture {
   const W = 1024
   const H = 200
-  const [c, g] = canvas(W, H)
+  const [c, g] = canvas(W * 2, H * 2)
+  g.scale(2, 2)
   const bg = g.createLinearGradient(0, 0, 0, H)
   bg.addColorStop(0, '#f3d98f')
   bg.addColorStop(1, '#d8b25a')
@@ -510,12 +512,12 @@ export function dialTexture(): Texture {
     ['MW', 98, 530, 1600, 1, ['600', '800', '1000', '1200', '1400', '1600']],
     ['SW', 168, 5.9, 18, 1, ['6', '8', '10', '12', '15', '18']],
   ]
-  g.font = 'bold 22px "Special Elite", Arial'
+  g.font = '700 26px "Barlow Condensed", Arial'
   for (const [name, y, , , , labels] of bands) {
     g.textAlign = 'left'
     g.fillText(name, 14, y + 4)
     g.textAlign = 'center'
-    g.font = '18px "Special Elite", Arial'
+    g.font = '600 22px "Barlow Condensed", Arial'
     labels.forEach((l, i) => {
       const x = 90 + (i / (labels.length - 1)) * (W - 160)
       g.fillText(l, x, y - 10)
@@ -533,10 +535,10 @@ export function dialTexture(): Texture {
       g.lineTo(x, y + (i % 5 === 0 ? 10 : 6))
       g.stroke()
     }
-    g.font = 'bold 22px "Special Elite", Arial'
+    g.font = '700 26px "Barlow Condensed", Arial'
   }
   g.textAlign = 'right'
-  g.font = '16px "Special Elite", Arial'
+  g.font = '600 18px "Barlow Condensed", Arial'
   g.fillText('MHz · kHz · MHz', W - 10, H - 8)
   return toTexture(c)
 }

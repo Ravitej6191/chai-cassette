@@ -1,7 +1,7 @@
 {
   "license": "CC0 1.0 — Poly Haven (polyhaven.com)",
   "note": "Downloaded at 1K, then optimised: models → single .glb with WebP textures (≤1024 px); PBR textures → WebP.",
-  "totalBytes": 13633606,
+  "totalBytes": 11811206,
   "files": [
     {
       "file": "hdri/warm_restaurant_night_1k.hdr",
@@ -12,6 +12,11 @@
       "file": "models/ArmChair_01/ArmChair_01.glb",
       "bytes": 565340,
       "source": "https://polyhaven.com/a/ArmChair_01"
+    },
+    {
+      "file": "models/boombox/boombox.glb",
+      "bytes": 772012,
+      "source": "https://polyhaven.com/a/boombox"
     },
     {
       "file": "models/brass_diya_lantern/brass_diya_lantern.glb",
@@ -37,11 +42,6 @@
       "file": "models/Ukulele_01/Ukulele_01.glb",
       "bytes": 584212,
       "source": "https://polyhaven.com/a/Ukulele_01"
-    },
-    {
-      "file": "models/vintage_radio_transceiver/vintage_radio_transceiver.glb",
-      "bytes": 2594412,
-      "source": "https://polyhaven.com/a/vintage_radio_transceiver"
     },
     {
       "file": "models/wicker_basket_01/wicker_basket_01.glb",

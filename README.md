@@ -66,15 +66,15 @@ Photo-scanned textures, models and the lighting HDRI come from [Poly Haven](http
 |---|---|
 | HDRI (reflections / ambient light) | `warm_restaurant_night` (1K) |
 | PBR textures (1K) | `wood_table_001` · `dark_wood` · `old_wooden_floor_02` · `painted_plaster_wall` · `rough_linen` |
-| Models (1K) | `potted_plant_01`, `potted_plant_02`, `calathea_orbifolia_01`, `WoodenChair_01`, `ArmChair_01`, `wicker_basket_01`, `brass_diya_lantern`, `vintage_radio_transceiver`, `Ukulele_01`, `mantel_clock_01` |
+| Models (1K) | `boombox`, `potted_plant_02`, `calathea_orbifolia_01`, `WoodenChair_01`, `ArmChair_01`, `wicker_basket_01`, `brass_diya_lantern`, `Ukulele_01`, `mantel_clock_01` |
 
 The deck, cassettes, doilies, rug, book spines and rain are still procedural. `src/scene/assets.tsx` has the `usePbr()` and `<Model>` helpers for adding more.
 
 ### Quality tiers
 
-The top-bar button cycles **Low → High → Ultra**. Low: bloom + grain. High: adds SMAA and full textures. Ultra: adds depth of field, 4× MSAA and **N8AO ambient occlusion** (needs a strong GPU). Phones start on Low.
+Choose a tier under **Settings → Graphics** (Auto · Low · High · Ultra). Low: bloom + grain. High: adds SMAA and full textures. Ultra: adds depth of field, 4× MSAA and **N8AO ambient occlusion** (needs a strong GPU). Phones start on Low.
 
-**Auto quality:** a built-in governor measures the real frame rate (shown in the top bar) and, if it stays under ~40 fps for a few seconds, steps the tier down by itself with a notice. It never steps up, and stops once you pick a tier by hand.
+**Auto quality:** a built-in governor measures the real frame rate (shown in Settings → Graphics) and, if it stays under ~40 fps for a few seconds, steps the tier down by itself with a notice. It never steps up, and stops once you pick a tier by hand.
 
 ## Notes
 
@@ -84,6 +84,10 @@ The top-bar button cycles **Low → High → Ultra**. Low: bloom + grain. High: 
 - The radio dial, band switch, tuning knob and antenna move but are silent until Phase 4 (the first touch says so).
 - The seven mix tapes on the rack are real: each synthesises its own raga (different scale, tempo and seed) the first time it is loaded.
 - Console shows one `THREE.Clock deprecated` warning; it comes from inside `@react-three/fiber`.
+
+## Interface
+
+Deliberately minimal: a view bar (Room · Deck · Tape · Controls · Radio · Meters · Shelf · Chai), one **Settings** menu (time of day, graphics tier, rain sound, help) and a single status line with the five transport keys. Tapes are chosen on the 3D shelf, not from a list. In a focus view the mouse wheel zooms only a little; while you hold a tape the wheel turns the tape instead.
 
 ## Development
 

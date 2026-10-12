@@ -149,7 +149,8 @@ export function Props() {
         <Model name="WoodenChair_01" width={0.48} position={[-1.2, 0, 0.66]} rotY={2.5} />
         <Model name="wicker_basket_01" maxDim={0.5} position={[0.5, 0, -0.1]} rotY={0.4} />
         <Model name="ArmChair_01" height={0.95} position={[-1.95, 0, 1.55]} rotY={0.9} />
-        <Model name="vintage_radio_transceiver" height={0.22} position={[-1.92, 1.5, -0.76]} rotY={0.25} />
+        {/* a second, real 80s boombox (Poly Haven CC0) on top of the bookcase */}
+        <Model name="boombox" width={0.46} position={[-1.98, 1.5, -0.72]} rotY={0.28} />
         <Model name="Ukulele_01" height={0.55} position={[-1.4, 0.04, -0.52]} rotY={0.3} rotZ={0.16} />
         <Model name="mantel_clock_01" width={0.2} position={[1.14, 0.9, -0.8]} rotY={-0.3} />
         <Diya />

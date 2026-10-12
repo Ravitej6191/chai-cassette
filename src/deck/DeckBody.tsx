@@ -16,7 +16,7 @@ function useDecal() {
         const ink = '#1d1a17'
         g.textBaseline = 'middle'
         const text = (t: string, x: number, y: number, size: number, o: { align?: CanvasTextAlign; color?: string; weight?: string; font?: string; alpha?: number } = {}) => {
-          g.font = `${o.weight ?? 'normal'} ${size * s}px ${o.font ?? '"Special Elite", "Courier New", monospace'}`
+          g.font = `${o.weight === 'bold' ? 700 : 600} ${size * s * 1.18}px ${o.font ?? '"Barlow Condensed", "Arial Narrow", Arial, sans-serif'}`
           g.textAlign = o.align ?? 'center'
           g.fillStyle = o.color ?? ink
           g.globalAlpha = o.alpha ?? 1

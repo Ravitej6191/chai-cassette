@@ -59,6 +59,7 @@ export function CameraRig() {
   const zoom = useDeck((s) => s.ui.zoom)
   const ready = useDeck((s) => s.ui.ready)
   const reduced = useDeck((s) => s.ui.reducedMotion)
+  const holding = useDeck((s) => s.heldId !== null)
   const aspect = useThree((s) => s.size.width / s.size.height)
   const controls = useRef<{ target: Vector3; update: () => void } | null>(null)
   const tween = useRef<gsap.core.Timeline | null>(null)
@@ -147,7 +148,8 @@ export function CameraRig() {
       enableDamping
       dampingFactor={0.08}
       rotateSpeed={0.55}
-      zoomSpeed={0.6}
+      zoomSpeed={0.45}
+      enableZoom={!holding}
       minDistance={0.25}
       maxDistance={4.4}
       minPolarAngle={0.6}
