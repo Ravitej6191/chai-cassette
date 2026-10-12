@@ -12,12 +12,12 @@ export const ASSET_BASE = `${import.meta.env.BASE_URL}assets/`
 
 type Maps = { map: Texture; roughnessMap: Texture; normalMap: Texture }
 
-/** PBR texture set `public/assets/tex/<id>/{diff,rough,nor}.jpg`, tiled `repeat` times. */
+/** PBR texture set `public/assets/tex/<id>/{diff,rough,nor}.webp`, tiled `repeat` times. */
 export function usePbr(id: string, repeat: [number, number]): Maps {
   const t = useTexture({
-    map: `${ASSET_BASE}tex/${id}/diff.jpg`,
-    roughnessMap: `${ASSET_BASE}tex/${id}/rough.jpg`,
-    normalMap: `${ASSET_BASE}tex/${id}/nor.jpg`,
+    map: `${ASSET_BASE}tex/${id}/diff.webp`,
+    roughnessMap: `${ASSET_BASE}tex/${id}/rough.webp`,
+    normalMap: `${ASSET_BASE}tex/${id}/nor.webp`,
   }) as Maps
   return useMemo(() => {
     const out = {} as Maps
@@ -50,12 +50,11 @@ interface ModelProps {
 
 /** A Poly Haven glTF scaled to `height`, centred on x/z and resting on y = 0. */
 export function Model({ name, height = 1, maxDim, width, position = [0, 0, 0], rotY = 0, rotZ = 0, castShadow = true }: ModelProps) {
-  const gltf = useGLTF(`${ASSET_BASE}models/${name}/${name}.gltf`)
+  const gltf = useGLTF(`${ASSET_BASE}models/${name}/${name}.glb`)
   const obj = useMemo(() => {
     const inner = SkeletonUtils.clone(gltf.scene) as Group
     const box = new Box3().setFromObject(inner)
     const size = box.getSize(new Vector3())
-    if (import.meta.env.DEV) console.info(`[model] ${name} raw size`, size.toArray().map((v) => +v.toFixed(2)))
     inner.scale.setScalar(width ? width / (size.x || 1) : maxDim ? maxDim / (Math.max(size.x, size.y, size.z) || 1) : height / (size.y || 1))
     box.setFromObject(inner)
     inner.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2)

@@ -144,7 +144,7 @@ export function Props() {
       <Clutter />
       <Suspense fallback={null}>
         <Model name="calathea_orbifolia_01" maxDim={0.85} position={[1.7, 0, -0.38]} rotY={0.6} />
-        <Model name="potted_plant_01" height={0.55} position={[-1.14, 0, -0.76]} rotY={1.2} />
+        <Model name="potted_plant_02" height={0.5} position={[-1.14, 0, -0.76]} rotY={3.4} />
         <Model name="potted_plant_02" height={0.3} position={[0.96, TABLE_TOP, -0.06]} rotY={0.4} />
         <Model name="WoodenChair_01" width={0.48} position={[-1.2, 0, 0.66]} rotY={2.5} />
         <Model name="wicker_basket_01" maxDim={0.5} position={[0.5, 0, -0.1]} rotY={0.4} />

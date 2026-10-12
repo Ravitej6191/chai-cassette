@@ -82,7 +82,8 @@ kbd {
   padding: 0 12px max(12px, env(safe-area-inset-bottom)); pointer-events: none;
 }
 .hud-bottom > * { pointer-events: auto; }
-.tapes { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 920px; }
+.tapes { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: flex-start; max-width: min(920px, calc(100vw - 24px)); overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+.tape-chip { flex: none; }
 .tape-chip {
   display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer;
   background: var(--panel); border: 1px solid var(--line); border-radius: 8px; backdrop-filter: blur(6px); max-width: 220px;

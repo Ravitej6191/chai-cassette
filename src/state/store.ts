@@ -41,6 +41,10 @@ interface UiState {
   quality: Quality
   tod: TimeOfDay
   rain: boolean
+  /** Smoothed frames per second, updated once a second. */
+  fps: number
+  /** When true the app lowers quality by itself if it cannot hold a smooth frame rate. */
+  autoQuality: boolean
   help: boolean
   reducedMotion: boolean
   notice: string | null
@@ -100,6 +104,8 @@ export const useDeck = create<DeckStore>((set, get) => ({
     quality: isMobile ? 'low' : 'high',
     tod: 'night',
     rain: true,
+    fps: 0,
+    autoQuality: true,
     help: !isMobile,
     reducedMotion:
       typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,

@@ -16,7 +16,7 @@ const TRAVEL = 0.009
 const KEY_D = 0.034
 const KEY_Z = FRONT_Z - 0.005
 const TIPS: Record<string, string> = {
-  REC: 'REC — engages only together with PLAY',
+  REC: 'REC — microphone recording is not built yet',
   PLAY: 'PLAY (Space)',
   REW: 'REWIND (←) · hold while playing for review',
   FF: 'FAST FORWARD (→) · hold while playing to cue',

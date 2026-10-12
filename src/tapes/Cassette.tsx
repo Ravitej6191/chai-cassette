@@ -17,7 +17,8 @@ import {
   Raycaster,
   type Mesh,
 } from 'three'
-import { Reels, packRadii } from '../deck/Reels'
+import { Reels } from '../deck/Reels'
+import { packRadii } from './reelMath'
 import { useDeck } from '../state/store'
 import { live } from '../state/live'
 import { held, flipHeld, insertHeld, pickUp, putBack } from '../controller/deck'

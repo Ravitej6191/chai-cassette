@@ -13,10 +13,10 @@ import { sfx, motorSound, rainSound } from '../sfx/sfx'
 import { anim, live } from '../state/live'
 import { isTransport, keysDown, transition, type DeckEvent, type KeyName } from '../state/machine'
 import { useDeck } from '../state/store'
-import { sourceFor, putProgramme, dropProgramme } from '../sources/library'
+import { sourceFor, putProgramme, dropProgramme, warmProgramme } from '../sources/library'
 import { decodeBlob } from '../sources/LocalFileSource'
 import { generateTape } from '../tapes/generator'
-import { synthesiseDemo } from '../tapes/demoTape'
+import { DEMO_SECONDS, FOUND_TAPES, synthesiseFound, synthesiseSide } from '../tapes/demoTape'
 import { forgetTape, loadSavedTapes, loadWear, saveTape, saveWear } from '../tapes/persistence'
 import { HUB_R, TAPE_SPEED, fullPackRadius, sideSeconds, type Side, type Tape } from '../tapes/types'
 import { RACK_SLOTS } from '../layout'
@@ -105,9 +105,15 @@ export function pressKey(key: KeyName, phase: 'down' | 'up' = 'down') {
     if (key === 'REW') dispatch({ type: 'REW_UP' })
     return
   }
+  if (key === 'REC') {
+    // Microphone recording is a later phase. Do not latch a record state that records nothing.
+    tapKey('REC')
+    whenAudio(sfx.reject)
+    store().notify('Recording is not built yet — it arrives with the microphone phase.')
+    return
+  }
   const ev: DeckEvent =
     key === 'PLAY' ? { type: 'PLAY' }
-    : key === 'REC' ? { type: 'REC' }
     : key === 'PAUSE' ? { type: 'PAUSE' }
     : key === 'FF' ? { type: 'FF_DOWN' }
     : key === 'REW' ? { type: 'REW_DOWN' }
@@ -118,9 +124,6 @@ export function pressKey(key: KeyName, phase: 'down' | 'up' = 'down') {
     whenAudio(sfx.reject)
     const m = store().machine
     if (key === 'PLAY' && !m.hasTape) store().notify('No tape in the deck — drag a cassette in, or press L to load one.')
-    if (key === 'REC') store().notify('REC only engages together with PLAY. (Microphone recording arrives in a later phase.)')
-  } else if (key === 'REC') {
-    store().notify('Record head armed — mic recording arrives in a later phase; the tape just plays.')
   }
 }
 
@@ -355,6 +358,7 @@ export async function insertHeld(): Promise<boolean> {
   s.setPlacement(id, 'cradle')
   whenAudio(sfx.tapeInsert)
   await sleep(750)
+  await waitFor(() => store().machine.mode === 'EMPTY')
   dispatch({ type: 'EJECT' }) // door closes: EMPTY + door open → latches shut
   return true
 }
@@ -384,17 +388,19 @@ export async function loadTape(id: string) {
     dispatch({ type: 'EJECT' })
     await waitFor(() => store().machine.mode === 'EMPTY')
   }
-  if (store().machine.mode === 'EJECTING') await waitFor(() => store().machine.mode === 'EMPTY')
-  if (!dispatch({ type: 'INSERT' })) return
+  // never drop a tape into a door that is still springing open
+  await waitFor(() => store().machine.mode === 'EMPTY' && store().machine.doorOpen)
+  if (store().machine.mode !== 'EMPTY' || !dispatch({ type: 'INSERT' })) return
   store().setDeckTape(id)
   store().setPlacement(id, 'cradle')
   whenAudio(sfx.tapeInsert)
   await sleep(750)
+  await waitFor(() => store().machine.mode === 'EMPTY') // the door must be fully open before it can be pushed shut
   dispatch({ type: 'EJECT' })
 }
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
-async function waitFor(cond: () => boolean, timeout = 4000) {
+async function waitFor(cond: () => boolean, timeout = 60000) {
   const t0 = performance.now()
   while (!cond() && performance.now() - t0 < timeout) await sleep(30)
 }
@@ -432,7 +438,9 @@ export async function addFiles(files: File[]) {
       let slot = freeSlot()
       if (slot < 0) {
         // Rack full: the oldest dropped tape makes room.
-        const oldest = s.tapes.find((t) => !t.isDemo && t.slot >= 0 && s.placement[t.id] === 'shelf')
+        // make room by retiring a mix tape first, then the oldest dropped one; never the demo
+        const retire = (t: Tape) => t.id !== 'demo-yaman' && t.slot >= 0 && s.placement[t.id] === 'shelf'
+        const oldest = [...s.tapes].reverse().find((t) => t.id.startsWith('found-') && retire(t)) ?? s.tapes.find(retire)
         if (!oldest) {
           s.notify('The shelf is full — put a tape back first.')
           return
@@ -516,23 +524,23 @@ async function runBoot(progress: ProgressFn) {
   )
   progress(0.15, 'Warming up the tape heads')
 
-  // 2. demo tape
-  const demo = await synthesiseDemo((f) => progress(0.15 + f * 0.55, 'Tuning the tanpura'))
+  // 2. the demo tape. Its music is synthesised the first time the tape is needed (and pre-warmed
+  // while the browser is idle), so boot does not wait on several seconds of synthesis.
   const demoTape = generateTape(
     {
       id: 'demo-yaman',
       name: 'Raga Yaman – Evening',
-      durationA: demo.A.duration,
+      durationA: DEMO_SECONDS.A,
       titleB: 'Bhoopali Bandish',
-      durationB: demo.B.duration,
+      durationB: DEMO_SECONDS.B,
       isDemo: true,
       wear: 0.32,
     },
     0,
   )
   demoTape.sides.B.title = 'Bhoopali Bandish'
-  putProgramme(demoTape.id, 'A', { buffer: demo.A })
-  putProgramme(demoTape.id, 'B', { buffer: demo.B })
+  putProgramme(demoTape.id, 'A', { make: () => synthesiseSide('yaman') })
+  putProgramme(demoTape.id, 'B', { make: () => synthesiseSide('bhoopali') })
   s.addTape(demoTape, 'shelf')
   progress(0.75, 'Dusting the shelf')
 
@@ -551,23 +559,17 @@ async function runBoot(progress: ProgressFn) {
     if (blobs[t.id]?.B) putProgramme(t.id, 'B', { blob: blobs[t.id].B })
     s.addTape(restored, 'shelf')
   }
-  // a few labelled mix tapes so the rack looks lived-in (no programme yet — real "found tapes" arrive in a later phase)
-  const found: [string, string][] = [
-    ['Sunday Morning Mix', 'for Amma'],
-    ['Kishore Kumar Hits', 'Side A'],
-    ['Rain Songs 1986', 'Monsoon'],
-    ['Ghazals', 'Jagjit Singh'],
-    ['Road Trip', 'Bombay to Pune'],
-    ['Old Film Songs', 'Rafi · Lata'],
-    ['Lata Evergreen', 'recorded off radio'],
-  ]
-  found.forEach(([name, note], i) => {
+  // mix tapes that fill the rack. Each has its own synthesised programme (different raga, tempo and
+  // mood), generated on demand when you load it — real "found tape" libraries arrive in a later phase.
+  FOUND_TAPES.forEach((f, i) => {
     const slot = freeSlot()
     if (slot < 0) return
-    const t = generateTape({ id: `found-${i}`, name, durationA: 0, wear: 0.15 + (i % 4) * 0.12, isDemo: true }, slot)
-    t.artist = note
-    t.title = name
-    t.sides.A.title = name
+    const id = `found-${i}`
+    const t = generateTape({ id, name: f.title, durationA: f.spec.seconds, wear: 0.15 + (i % 4) * 0.12, isDemo: true }, slot)
+    t.artist = f.note
+    t.title = f.title
+    t.sides.A.title = f.title
+    putProgramme(id, 'A', { make: () => synthesiseFound(i) })
     s.addTape(t, 'shelf')
   })
   const dw = wear[demoTape.id]
@@ -577,14 +579,15 @@ async function runBoot(progress: ProgressFn) {
   // 4. settings → audio engine; first gesture unlocks audio
   const unlock = () => {
     void engine.resume().then(() => engine.applySettings(store().settings))
-    window.removeEventListener('pointerdown', unlock)
-    window.removeEventListener('keydown', unlock)
+    for (const ev of GESTURES) window.removeEventListener(ev, unlock)
   }
-  window.addEventListener('pointerdown', unlock)
-  window.addEventListener('keydown', unlock)
+  const GESTURES = ['pointerdown', 'touchend', 'click', 'keydown'] as const
+  for (const ev of GESTURES) window.addEventListener(ev, unlock)
   engine.applySettings(store().settings)
   useDeck.subscribe((st, prev) => {
     if (st.settings !== prev.settings) engine.applySettings(st.settings)
   })
   progress(1, 'Ready')
+  // pre-synthesise the demo tape while the browser is idle so the first load feels instant
+  setTimeout(() => void warmProgramme(demoTape.id, 'A'), 4000)
 }

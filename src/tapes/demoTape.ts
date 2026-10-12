@@ -45,7 +45,7 @@ function tabla(L: Float32Array, R: Float32Array, startSec: number, low: boolean,
   }
 }
 
-interface RagaSpec {
+export interface RagaSpec {
   rootHz: number
   /** Semitone offsets of the scale degrees used. */
   scale: number[]
@@ -54,7 +54,7 @@ interface RagaSpec {
   seconds: number
 }
 
-function renderRaga(spec: RagaSpec): AudioBuffer {
+export function renderRaga(spec: RagaSpec): AudioBuffer {
   const len = Math.floor(spec.seconds * SR)
   const buf = new AudioBuffer({ length: len, numberOfChannels: 2, sampleRate: SR })
   const L = new Float32Array(len)
@@ -116,19 +116,34 @@ function renderRaga(spec: RagaSpec): AudioBuffer {
   return buf
 }
 
-export interface DemoAudio {
-  A: AudioBuffer
-  B: AudioBuffer
-}
+/** Programme lengths of the demo tape's two sides, in seconds (known up front so the label can show them). */
+export const DEMO_SECONDS = { A: 156, B: 112 } as const
 
-/** Yield to the event loop so the loading screen can paint between the two renders. */
+const DEMO_SPECS = {
+  yaman: { rootHz: 130.81, scale: [0, 2, 4, 6, 7, 9, 11], bpm: 68, seed: 1984, seconds: DEMO_SECONDS.A }, // Yaman
+  bhoopali: { rootHz: 146.83, scale: [0, 2, 4, 7, 9], bpm: 84, seed: 1987, seconds: DEMO_SECONDS.B }, // Bhoopali
+} satisfies Record<string, RagaSpec>
+
+/** The mix tapes on the rack: each gets its own scale, tempo and seed so they all sound different. */
+export const FOUND_TAPES: { title: string; note: string; spec: RagaSpec }[] = [
+  { title: 'Sunday Morning Mix', note: 'for Amma', spec: { rootHz: 146.83, scale: [0, 2, 4, 7, 9], bpm: 76, seed: 11, seconds: 84 } },
+  { title: 'Kishore Kumar Hits', note: 'Side A', spec: { rootHz: 164.81, scale: [0, 2, 3, 5, 7, 9, 10], bpm: 96, seed: 23, seconds: 92 } },
+  { title: 'Rain Songs 1986', note: 'Monsoon', spec: { rootHz: 123.47, scale: [0, 1, 4, 5, 7, 8, 11], bpm: 62, seed: 37, seconds: 100 } },
+  { title: 'Ghazals', note: 'Jagjit Singh', spec: { rootHz: 130.81, scale: [0, 2, 3, 5, 7, 8, 10], bpm: 58, seed: 41, seconds: 96 } },
+  { title: 'Road Trip', note: 'Bombay to Pune', spec: { rootHz: 174.61, scale: [0, 2, 4, 5, 7, 9, 11], bpm: 112, seed: 53, seconds: 80 } },
+  { title: 'Old Film Songs', note: 'Rafi · Lata', spec: { rootHz: 155.56, scale: [0, 2, 4, 6, 7, 9, 11], bpm: 88, seed: 67, seconds: 88 } },
+  { title: 'Lata Evergreen', note: 'recorded off radio', spec: { rootHz: 138.59, scale: [0, 2, 4, 7, 9], bpm: 70, seed: 79, seconds: 90 } },
+]
+
+/** Yield to the event loop so the UI can paint before a long synthesis starts. */
 const tick = () => new Promise<void>((res) => setTimeout(res, 0))
 
-export async function synthesiseDemo(onProgress?: (f: number) => void): Promise<DemoAudio> {
-  const A = renderRaga({ rootHz: 130.81, scale: [0, 2, 4, 6, 7, 9, 11], bpm: 68, seed: 1984, seconds: 156 }) // Yaman
-  onProgress?.(0.5)
+export async function synthesiseSide(which: keyof typeof DEMO_SPECS): Promise<AudioBuffer> {
   await tick()
-  const B = renderRaga({ rootHz: 146.83, scale: [0, 2, 4, 7, 9], bpm: 84, seed: 1987, seconds: 112 }) // Bhoopali
-  onProgress?.(1)
-  return { A, B }
+  return renderRaga(DEMO_SPECS[which])
+}
+
+export async function synthesiseFound(index: number): Promise<AudioBuffer> {
+  await tick()
+  return renderRaga(FOUND_TAPES[index].spec)
 }

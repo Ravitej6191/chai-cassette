@@ -3,7 +3,7 @@
 A 3D, fully playable two-in-one cassette deck in a 1980s Indian living room at night.
 Procedural scene (no model/texture/audio assets), real tape physics, a Web Audio "worn tape" effects chain.
 
-**Status: Phases 1 + 2.** Phases 3–8 (radio, free libraries, tape abuse, recording/mixtapes, Spotify, power cuts…) are architected but not built — see below.
+**Status: Phases 1 + 2 (plus guided camera views).** Phases 3–8 (radio, free libraries, tape abuse, recording/mixtapes, Spotify, power cuts…) are architected but not built — see below.
 
 ## Run
 
@@ -11,7 +11,7 @@ Procedural scene (no model/texture/audio assets), real tape physics, a Web Audio
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # typecheck + production build
-npm test           # state-machine tests
+npm test           # unit tests (deck state machine, cassette geometry, tape generator)
 ```
 
 > The npm scripts call `node node_modules/...` directly because a `&` in the folder name breaks the `.cmd` shims on Windows.
@@ -23,7 +23,7 @@ npm test           # state-machine tests
 | Drag an MP3/WAV onto the page (or **choose a file** in `?`) | A labelled tape is generated and put in your hand; saved to IndexedDB |
 | Click a cassette, drag it to the door | Door springs open, tape drops in, door latches |
 | `1`–`9`, `L`, or the tape chips | Load a tape without dragging (ejects the current one first) |
-| `Space` / `P`, `S`, `E`, hold `←` `→`, `R` | Play-pause, stop, stop→eject, rewind/FF (held while playing = review/cue), record (needs PLAY) |
+| `Space` / `P`, `S`, `E`, hold `←` `→` | Play-pause, stop, stop→eject, rewind/FF (held while playing = review/cue) |
 | `F` / double-click / wheel while holding a tape | Flip / spin it; `Esc` puts it back |
 | Drag a knob up/down | Volume, bass, treble, balance, pitch (±12 %, centre detent) |
 | Click toggles / slider | Dolby, auto-reverse, low battery, tape type I / II / IV |
@@ -60,7 +60,7 @@ Pack radii come from real cassette formats (C30–C120: tape thickness, 4.76 cm/
 
 ## Third-party assets (CC0)
 
-Photo-scanned textures, models and the lighting HDRI come from [Poly Haven](https://polyhaven.com) (CC0 1.0 — no attribution required, credited here anyway). They live in `public/assets/`; `public/assets/ASSETS.json` lists every file with its source URL.
+Photo-scanned textures, models and the lighting HDRI come from [Poly Haven](https://polyhaven.com) (CC0 1.0 — no attribution required, credited here anyway). They live in `public/assets/` (~14 MB after optimisation: .glb models with WebP textures, WebP PBR maps); `public/assets/ASSETS.json` lists every file with its source URL.
 
 | Kind | Assets |
 |---|---|
@@ -72,12 +72,20 @@ The deck, cassettes, doilies, rug, book spines and rain are still procedural. `s
 
 ### Quality tiers
 
-Top-bar button cycles **Low → High → Ultra**. Low: bloom + grain. High: adds SMAA and full textures. Ultra: adds depth of field, 4× MSAA and **N8AO ambient occlusion** (needs a strong GPU). Phones start on Low.
+The top-bar button cycles **Low → High → Ultra**. Low: bloom + grain. High: adds SMAA and full textures. Ultra: adds depth of field, 4× MSAA and **N8AO ambient occlusion** (needs a strong GPU). Phones start on Low.
+
+**Auto quality:** a built-in governor measures the real frame rate (shown in the top bar) and, if it stays under ~40 fps for a few seconds, steps the tier down by itself with a notice. It never steps up, and stops once you pick a tier by hand.
 
 ## Notes
 
 - Quality: auto-selects **low** on touch/narrow screens (no DoF, basic shadows, fewer particles, dpr 1). Toggle in the top bar.
 - `prefers-reduced-motion` disables camera sway and shortens camera moves.
-- REC latches with PLAY and lights the REC lamp, but microphone recording is Phase 7 — the tape just plays.
-- The radio dial, band switch, tuning knob and antenna move but are silent until Phase 4.
+- **REC does not record yet** — pressing it plays a "not yet" sound and shows a message; microphone recording is Phase 7.
+- The radio dial, band switch, tuning knob and antenna move but are silent until Phase 4 (the first touch says so).
+- The seven mix tapes on the rack are real: each synthesises its own raga (different scale, tempo and seed) the first time it is loaded.
 - Console shows one `THREE.Clock deprecated` warning; it comes from inside `@react-three/fiber`.
+
+## Development
+
+- CI (`.github/workflows/ci.yml`) runs typecheck, tests and build on every push.
+- In dev builds `window.__app` exposes the store, engine, controller and gsap for console poking.

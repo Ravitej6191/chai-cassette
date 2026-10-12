@@ -69,8 +69,7 @@ function Readout() {
 }
 
 function TapeList() {
-  // decorative rack tapes (no programme yet) stay off the quick-load list
-  const tapes = useDeck((s) => s.tapes).filter((t) => !t.id.startsWith('found-'))
+  const tapes = useDeck((s) => s.tapes)
   const deckId = useDeck((s) => s.deckTapeId)
   const placement = useDeck((s) => s.placement)
   return (
@@ -131,6 +130,8 @@ export function HUD() {
   const quality = useDeck((s) => s.ui.quality)
   const tod = useDeck((s) => s.ui.tod)
   const rain = useDeck((s) => s.ui.rain)
+  const fps = useDeck((s) => s.ui.fps)
+  const autoQuality = useDeck((s) => s.ui.autoQuality)
   const help = useDeck((s) => s.ui.help)
   const audioReady = useDeck((s) => s.ui.audioReady)
   const patch = useDeck((s) => s.patchUi)
@@ -164,8 +165,8 @@ export function HUD() {
           <button type="button" className="pill" aria-pressed={rain} onClick={() => patch({ rain: !rain })} title="Rain sound">
             {rain ? "Rain on" : "Rain off"}
           </button>
-          <button type="button" className="pill" onClick={() => patch({ quality: quality === 'low' ? 'high' : quality === 'high' ? 'ultra' : 'low' })} title="Cycle graphics quality (Ultra adds ambient occlusion — needs a strong GPU)">
-            {quality === 'ultra' ? 'Ultra quality' : quality === 'high' ? 'High quality' : 'Low quality'}
+          <button type="button" className="pill" onClick={() => patch({ autoQuality: false, quality: quality === 'low' ? 'high' : quality === 'high' ? 'ultra' : 'low' })} title="Cycle graphics quality (Ultra adds ambient occlusion — needs a strong GPU)">
+            {quality === 'ultra' ? 'Ultra' : quality === 'high' ? 'High' : 'Low'}{autoQuality ? ' · auto' : ''}{fps ? ` · ${fps} fps` : ''}
           </button>
           <button type="button" className="pill" onClick={() => patch({ help: !help })} aria-expanded={help}>
             ?

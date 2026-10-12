@@ -3,18 +3,9 @@ import { useFrame } from '@react-three/fiber'
 import { BoxGeometry, CylinderGeometry, Group, MeshStandardMaterial, type Mesh } from 'three'
 import { live } from '../state/live'
 import { CASSETTE } from '../layout'
-import { HUB_R, fullPackRadius, type Tape } from '../tapes/types'
+import { HUB_R, type Tape } from '../tapes/types'
+import { packRadii } from '../tapes/reelMath'
 import { packTexture } from '../scene/textures'
-
-/** Pack radii for a given fraction of ribbon on the right-hand hub. */
-export function packRadii(tape: Tape, rightFrac: number) {
-  const full = fullPackRadius(tape.format)
-  const area = full * full - HUB_R * HUB_R
-  return {
-    rR: Math.sqrt(HUB_R * HUB_R + rightFrac * area),
-    rL: Math.sqrt(HUB_R * HUB_R + (1 - rightFrac) * area),
-  }
-}
 
 const PACK_T = 0.0074
 const HUB_T = 0.0092
